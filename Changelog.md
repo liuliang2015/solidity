@@ -5,6 +5,7 @@ Features:
  * General: Support accessing dynamic return data in post-byzantium EVMs.
  * Interfaces: Allow overriding external functions in interfaces with public in an implementing contract.
  * Syntax Checker: Issue warning for empty structs (or error as experimental 0.5.0 feature).
+ * General: Introduce new constructor syntax using the ``constructor`` keyword as experimental 0.5.0 feature.
 
 Bugfixes:
  * Code Generator: Allow ``block.blockhash`` without being called.

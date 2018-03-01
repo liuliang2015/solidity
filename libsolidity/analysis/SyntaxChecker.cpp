@@ -226,6 +226,22 @@ bool SyntaxChecker::visit(FunctionDefinition const& _function)
 				"\"."
 			);
 	}
+
+	if (_function.isOldStyleConstructor())
+	{
+		if (v050)
+			m_errorReporter.syntaxError(
+				_function.location(),
+				"Functions are not allowed to have the same name as the contract. "
+				"If you intend this to be a constructor, use \"constructor(...) { ... }\" to define it."
+			);
+		else
+			m_errorReporter.warning(
+				_function.location(),
+				"Defining constructors as functions with the same name as the contract is deprecated. "
+				"Use \"constructor(...) { ... }\" instead."
+			);
+	}
 	return true;
 }
 
