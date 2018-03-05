@@ -338,6 +338,8 @@ Parser::FunctionHeaderParserResult Parser::parseFunctionHeader(bool _forceEmptyN
 	FunctionHeaderParserResult result;
 
 	if (m_scanner->currentToken() == Token::Function)
+		// In case of old style constructors, i.e. functions with the same name as the contract,
+		// this is set to true later in parseFunctionDefinitionOrFunctionTypeStateVariable.
 		result.isConstructor = false;
 	else if (m_scanner->currentToken() == Token::Identifier && m_scanner->currentLiteral() == "constructor")
 		result.isConstructor = true;
