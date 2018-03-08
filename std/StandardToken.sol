@@ -1,4 +1,4 @@
-pragma solidity ^0.4.20; // should actually be 0.4.21
+pragma solidity ^0.4.21; // should actually be 0.4.22
 
 import "./Token.sol";
 
