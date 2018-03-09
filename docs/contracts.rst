@@ -40,7 +40,7 @@ This means that cyclic creation dependencies are impossible.
 
 ::
 
-    pragma solidity ^0.4.21; // should actually be 0.4.22
+    pragma solidity >0.4.21;
 
     contract OwnedToken {
         // TokenCreator is a contract type that is defined below.
@@ -981,7 +981,7 @@ Constructor functions can be either ``public`` or ``internal``.
 
 ::
 
-    pragma solidity ^0.4.21; // should actually be 0.4.22
+    pragma solidity >0.4.21;
 
     contract A {
         uint public a;
