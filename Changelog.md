@@ -1,9 +1,11 @@
 ### 0.4.22 (unreleased)
 
 Features:
+ * Code Generator: Initialize arrays without using ``msize()``.
  * Commandline interface: Error when missing or inaccessible file detected. Suppress it with the ``--ignore-missing`` flag.
  * General: Support accessing dynamic return data in post-byzantium EVMs.
  * Interfaces: Allow overriding external functions in interfaces with public in an implementing contract.
+ * Optimizer: Optimize across ``mload`` if ``msize()`` is not used.
 
 Bugfixes:
  * Code Generator: Allow ``block.blockhash`` without being called.
