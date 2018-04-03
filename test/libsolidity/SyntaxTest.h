@@ -36,10 +36,14 @@ namespace solidity
 namespace test
 {
 
-struct SyntaxTestExpectation
+struct SyntaxTestError
 {
 	std::string type;
 	std::string message;
+	bool operator==(SyntaxTestError const& _rhs) const
+	{
+		return type == _rhs.type && message == _rhs.message;
+	}
 };
 
 
@@ -50,38 +54,37 @@ public:
 
 	bool run(std::ostream& _stream, std::string const& _linePrefix = "", bool const _formatted = false);
 
-	std::vector<SyntaxTestExpectation> const& expectations() const { return m_expectations; }
+	std::vector<SyntaxTestError> const& expectations() const { return m_expectations; }
 	std::string const& source() const { return m_source; }
-	ErrorList const& errorList() const { return m_errorList; }
-	ErrorList const& compilerErrors() const { return m_compiler.errors(); }
+	std::vector<SyntaxTestError> const& errorList() const { return m_errorList; }
 
-	void printExpected(std::ostream& _stream, std::string const& _linePrefix, bool const _formatted = false) const;
-
-	void printErrorList(
+	static void printErrorList(
 		std::ostream& _stream,
-		ErrorList const& _errors,
+		std::vector<SyntaxTestError> const& _errors,
 		std::string const& _linePrefix,
-		bool const _ignoreWarnings,
-		bool const _lineNumbers,
 		bool const _formatted = false
-	) const;
+	);
 
 	static int registerTests(
 		boost::unit_test::test_suite& _suite,
 		boost::filesystem::path const& _basepath,
-		boost::filesystem::path const& _path
+		boost::filesystem::path const& _path,
+		EVMVersion _evmVersion = EVMVersion()
 	);
 	static bool isTestFilename(boost::filesystem::path const& _filename);
+	void setEVMVersion(EVMVersion _version)
+	{
+		m_EVMVersion = _version;
+	}
 private:
-	bool matchesExpectations(ErrorList const& _errors) const;
-	static std::string errorMessage(Error const& _e);
+	static std::string errorMessage(Exception const& _e);
 	static std::string parseSource(std::istream& _stream);
-	static std::vector<SyntaxTestExpectation> parseExpectations(std::istream& _stream);
-	int offsetToLineNumber(int _location) const;
+	static std::vector<SyntaxTestError> parseExpectations(std::istream& _stream);
 
+	EVMVersion m_EVMVersion;
 	std::string m_source;
-	std::vector<SyntaxTestExpectation> m_expectations;
-	ErrorList m_errorList;
+	std::vector<SyntaxTestError> m_expectations;
+	std::vector<SyntaxTestError> m_errorList;
 };
 
 }

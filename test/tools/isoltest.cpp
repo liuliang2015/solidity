@@ -55,7 +55,6 @@ public:
 	{
 		Success,
 		Failure,
-		ParserError,
 		InputOutputError
 	};
 
@@ -76,7 +75,7 @@ private:
 		Quit
 	};
 
-	Request handleResponse(bool const _parserError);
+	Request handleResponse();
 
 	void printContract() const;
 
@@ -100,7 +99,6 @@ void SyntaxTestTool::printContract() const
 SyntaxTestTool::Result SyntaxTestTool::process()
 {
 	bool success;
-	bool parserError = false;
 	std::stringstream outputMessages;
 
 	(FormattedScope(cout, m_formatted, {BOLD}) << m_name << ": ").flush();
@@ -115,15 +113,7 @@ SyntaxTestTool::Result SyntaxTestTool::process()
 		return Result::InputOutputError;
 	}
 
-	try
-	{
-		success = m_test->run(outputMessages, "  ", m_formatted);
-	}
-	catch (...)
-	{
-		success = false;
-		parserError = true;
-	}
+	success = m_test->run(outputMessages, "  ", m_formatted);
 
 	if (success)
 	{
@@ -137,28 +127,14 @@ SyntaxTestTool::Result SyntaxTestTool::process()
 		FormattedScope(cout, m_formatted, {BOLD, CYAN}) << "  Contract:" << endl;
 		printContract();
 
-		if (parserError)
-		{
-			cout << "  ";
-			FormattedScope(cout, m_formatted, {INVERSE, RED}) << "Parsing failed:" << endl;
-			m_test->printErrorList(cout, m_test->compilerErrors(), "    ", true, true, m_formatted);
-			cout << endl;
-			return Result::ParserError;
-		}
-		else
-		{
-			cout << outputMessages.str() << endl;
-			return Result::Failure;
-		}
+		cout << outputMessages.str() << endl;
+		return Result::Failure;
 	}
 }
 
-SyntaxTestTool::Request SyntaxTestTool::handleResponse(bool const _parserError)
+SyntaxTestTool::Request SyntaxTestTool::handleResponse()
 {
-	if (_parserError)
-		cout << "(e)dit/(s)kip/(q)uit? ";
-	else
-		cout << "(e)dit/(u)pdate expectations/(s)kip/(q)uit? ";
+	cout << "(e)dit/(u)pdate expectations/(s)kip/(q)uit? ";
 	cout.flush();
 
 	while (true)
@@ -169,18 +145,15 @@ SyntaxTestTool::Request SyntaxTestTool::handleResponse(bool const _parserError)
 			cout << endl;
 			return Request::Skip;
 		case 'u':
-			if (_parserError)
-				break;
-			else
-			{
-				cout << endl;
-				ofstream file(m_path.string(), ios::trunc);
-				file << m_test->source();
-				file << "// ----" << endl;
-				if (!m_test->errorList().empty())
-					m_test->printErrorList(file, m_test->errorList(), "// ", false, false, false);
-				return Request::Rerun;
-			}
+		{
+			cout << endl;
+			ofstream file(m_path.string(), ios::trunc);
+			file << m_test->source();
+			file << "// ----" << endl;
+			if (!m_test->errorList().empty())
+				m_test->printErrorList(file, m_test->errorList(), "// ", false);
+			return Request::Rerun;
+		}
 		case 'e':
 			cout << endl << endl;
 			if (system((editor + " \"" + m_path.string() + "\"").c_str()))
@@ -231,8 +204,7 @@ SyntaxTestStats SyntaxTestTool::processPath(
 			switch(result)
 			{
 			case Result::Failure:
-			case Result::ParserError:
-				switch(testTool.handleResponse(result == Result::ParserError))
+				switch(testTool.handleResponse())
 				{
 				case Request::Quit:
 					return { successCount, runCount };

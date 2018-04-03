@@ -59,7 +59,8 @@ test_suite* init_unit_test_suite( int /*argc*/, char* /*argv*/[] )
 	solAssert(dev::solidity::test::SyntaxTest::registerTests(
 		master,
 		dev::test::Options::get().testPath / "libsolidity",
-		"syntaxTests"
+		"syntaxTests",
+		dev::test::Options::get().evmVersion()
 	) > 0, "no syntax tests found");
 	if (dev::test::Options::get().disableIPC)
 	{
